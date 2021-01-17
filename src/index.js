@@ -40,9 +40,9 @@ function Promise(f) {
   }
 }
 
-Promise.prototype.then = function(onFulfilled, onRejected) {
+Promise.prototype.then = function (onFulfilled, onRejected) {
   return new Promise((resolve, reject) => {
-    let callback = { onFulfilled, onRejected, resolve, reject }
+    const callback = { onFulfilled, onRejected, resolve, reject }
 
     if (this.state === PENDING) {
       this.callbacks.push(callback)
@@ -53,7 +53,7 @@ Promise.prototype.then = function(onFulfilled, onRejected) {
 }
 
 const handleCallback = (callback, state, result) => {
-  let { onFulfilled, onRejected, resolve, reject } = callback
+  const { onFulfilled, onRejected, resolve, reject } = callback
   try {
     if (state === FULFILLED) {
       isFunction(onFulfilled) ? resolve(onFulfilled(result)) : resolve(result)
@@ -111,6 +111,104 @@ Promise.deferred = () => {
     dfd.reject = reject
   })
   return dfd
+}
+
+Promise.resolve = result => {
+  if (result instanceof Promise) {
+    return result
+  }
+  return new Promise((resolve) => resolve(result))
+}
+
+Promise.reject = reason => {
+  return new Promise((resolve, reject) => {
+    reject(reason)
+  })
+}
+
+Promise.all = promiseList => {
+  const resPromise = new Promise((resolve, reject) => {
+    let count = 0
+    const result = []
+    const length = promiseList.length
+
+    if (length === 0) {
+      return resolve(result)
+    }
+
+    promiseList.forEach((promise, index) => {
+      Promise.resolve(promise).then(value => {
+        count++
+        result[index] = value
+        if (count === length) {
+          resolve(result)
+        }
+      }, reason => reject(reason))
+    })
+  })
+
+  return resPromise
+}
+
+Promise.race = promiseList => {
+  const resPromise = new Promise((resolve, reject) => {
+    const length = promiseList.length
+
+    if (length === 0) {
+      return resolve(result)
+    } else {
+      promiseList.forEach(promise => {
+        Promise.resolve(promise).then(value => resolve(value), reason => reject(reason))
+      })
+    }
+  })
+
+  return resPromise
+}
+
+Promise.prototype.catch = function (onRejected) {
+  this.then(null, onRejected)
+}
+
+Promise.prototype.finally = function (fn) {
+  return this.then(value => Promise.resolve(fn()).then(() => value),
+    reason => Promise.resolve(fn()).then(() => {
+      throw reason
+    }))
+}
+
+Promise.allSettled = promiseList => {
+  return new Promise(resolve => {
+    let count = 0
+    const result = []
+    const length = promiseList.length
+
+    if (length === 0) {
+      return resolve(result)
+    } else {
+      promiseList.forEach((promise, index) => {
+        Promise.resolve(promise).then(value => {
+          count++
+          result[index] = {
+            value,
+            status: 'fulfilled',
+          }
+          if (count === length) {
+            return resolve(result)
+          }
+        }, reason => {
+          count++
+          result[index] = {
+            reason,
+            status: 'rejected',
+          }
+          if (count === length) {
+            return resolve(result)
+          }
+        })
+      })
+    }
+  })
 }
 
 module.exports = Promise
