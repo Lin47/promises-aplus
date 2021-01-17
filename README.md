@@ -1,12 +1,12 @@
 # Promise/A+规范翻译以及具体实现
 
-![image.png](https://cdn.nlark.com/yuque/0/2021/png/374731/1610866246844-357d2b80-3218-4178-bc8a-bbff4638186c.png#align=left&display=inline&height=374&margin=%5Bobject%20Object%5D&name=image.png&originHeight=374&originWidth=739&size=56688&status=done&style=none&width=739)<br />_promise _表示一个异步操作的实际结果，与 `promise` 交互的主要手段是 `then`  方法，该方法注册回调会接收一个 `promise` 的最终值或者 `promise` 被拒绝的理由/原因。<br />该规范详细描述了 `then` 方法的行为，提供了一个可操作交互的基础，所有符合 `promise/A+` 规范的 `promise` 都可以依靠该基础来实现。因此这个规范被认为是非常稳定的，尽管 `promise/A+` 组织可能偶尔地通过一些较小的向后兼容的改变修订规范，来解决新发现的一些边界情况。但是，只有在经过仔细的考虑、讨论和测试后，我们才会集成大的或者向后不兼容的更改。<br />过去， `promise/A+` 阐明了早期的 `promise/A+提案` 的行为条款，扩展了原有规范约定俗成的行为（_de facto：_实际上存在的（不一定合法））, 并且省略了没有被指明或者有问题的部分。<br />最终， `promise/A+` 规范没有处理如何创建、满足或者拒绝 `promises` ，而是选择去专注于提供一个可以操作的 `then` 方法。在相关规范的进一步的工作中可能会提及到这些话题。<br />
+![image.png](img/1.png)<br />_promise _表示一个异步操作的实际结果，与 `promise` 交互的主要手段是 `then`  方法，该方法注册回调会接收一个 `promise` 的最终值或者 `promise` 被拒绝的理由/原因。<br />该规范详细描述了 `then` 方法的行为，提供了一个可操作交互的基础，所有符合 `promise/A+` 规范的 `promise` 都可以依靠该基础来实现。因此这个规范被认为是非常稳定的，尽管 `promise/A+` 组织可能偶尔地通过一些较小的向后兼容的改变修订规范，来解决新发现的一些边界情况。但是，只有在经过仔细的考虑、讨论和测试后，我们才会集成大的或者向后不兼容的更改。<br />过去， `promise/A+` 阐明了早期的 `promise/A+提案` 的行为条款，扩展了原有规范约定俗成的行为（_de facto：_实际上存在的（不一定合法））, 并且省略了没有被指明或者有问题的部分。<br />最终， `promise/A+` 规范没有处理如何创建、满足或者拒绝 `promises` ，而是选择去专注于提供一个可以操作的 `then` 方法。在相关规范的进一步的工作中可能会提及到这些话题。<br />
 
 <a name="8b2a2019"></a>
 
 # 1.术语
 
-![image.png](https://cdn.nlark.com/yuque/0/2021/png/374731/1610851275369-6003ea34-9712-4ff3-b3e7-00bbc868eca5.png#align=left&display=inline&height=221&margin=%5Bobject%20Object%5D&name=image.png&originHeight=221&originWidth=830&size=29181&status=done&style=none&width=830)
+![image.png](img/2.png)
 
 - promise 是一个包含 `then` 方法的对象或者函数，该方法符合规范指定的行为。
 - thenable 是一个定义了 `then` 方法的对象或者函数。
@@ -24,7 +24,7 @@
 
 ## 2.1. promise 状态
 
-![image.png](https://cdn.nlark.com/yuque/0/2021/png/374731/1610851594540-c49e0e18-ea7b-48b6-932a-2db3ad6b8e33.png#align=left&display=inline&height=411&margin=%5Bobject%20Object%5D&name=image.png&originHeight=411&originWidth=776&size=39690&status=done&style=none&width=776)
+![image.png](img/3.png)
 
 - `promise` 必须是以下三种状态值的其中一种：pending, fulfilled, 或者rejected。
 - 当 `promise` 状态是 pending 时，可以转换为 fulfilled 或者 rejected。
@@ -36,7 +36,7 @@
 
 ## 2.2. then方法
 
-![image.png](https://cdn.nlark.com/yuque/0/2021/png/374731/1610851918302-61b3e1ab-51d6-4b7f-96cc-2118b89a198a.png#align=left&display=inline&height=848&margin=%5Bobject%20Object%5D&name=image.png&originHeight=848&originWidth=760&size=120324&status=done&style=none&width=760)
+![image.png](img/4.png)
 
 - promise 必须提供 `then` 方法来访问当前或最终的值或原因。
 - promise `then` 方法接受2个参数， `promise.then(onFulfilled, onRejected)`.
@@ -60,7 +60,7 @@ promise2 = promise1.then(onFulfilled, onRejected)
 
 ## 2.3. promise解决程序
 
-![image.png](https://cdn.nlark.com/yuque/0/2021/png/374731/1610856559913-bb0d8acd-98c2-4a10-b0c5-8599c49d5234.png#align=left&display=inline&height=831&margin=%5Bobject%20Object%5D&name=image.png&originHeight=831&originWidth=788&size=138434&status=done&style=none&width=788)
+![image.png](img/5.png)
 
 -  promise 解决程序是一个抽象操作，将 `promise` 和 `value` 作为输入，可以视为 `[[Resolve]](promise, x)`。如果 `x` 是一个 **thenable**,它会尝试让 `promise` 采用 `x` 的状态，并假设 `x` 的行为至少在某种程度上类似`promise` ，否则将使用 `x` 作为执行 `promise` 的值进行处理。
 -  这种 `thenable` 的特性使得 `Promise` 的实现更具有通用性：只要它们暴露了一个符合 `promise/A+` 规范的 `then` 方法。这同时也使得遵循 `promise/A+` 规范的实现可以与那些不太规范的实现能共存。
@@ -88,7 +88,7 @@ promise2 = promise1.then(onFulfilled, onRejected)
 
 # 3.注释
 
-![image.png](https://cdn.nlark.com/yuque/0/2021/png/374731/1610853813936-94d4348f-c423-4943-891b-940ade77e3ee.png#align=left&display=inline&height=464&margin=%5Bobject%20Object%5D&name=image.png&originHeight=464&originWidth=753&size=82511&status=done&style=none&width=753)
+![image.png](img/6.png)
 <a name="YSujD"></a>
 
 ###### 1. "平台代码"指的是引擎，环境，以及 `promise` 实现代码。实际上，这个要求确保了 `onFulfilled/onRejected` 异步执行， 并且应该在 `then` 方法被调用的那一轮事件循环之后用新的执行栈执行。 具体实现可以使用宏任务机制（setTimeout、setImmediate）或者微任务机制(MutationObserver、process.nextTick)。由于 `promise` 实现被视为平台代码，所以在自身处理程序被调用时可能已经包含一个任务调度队列。
@@ -122,7 +122,7 @@ promise2 = promise1.then(onFulfilled, onRejected)
 
 ## 4.1 前期工作
 
-通过 npm install promises-aplus-tests ，可以下载测试套件。<br />![image.png](https://cdn.nlark.com/yuque/0/2021/png/374731/1610871563770-22a18fb3-5b5f-42d3-ac78-866fcf21525f.png#align=left&display=inline&height=63&margin=%5Bobject%20Object%5D&name=image.png&originHeight=63&originWidth=409&size=3283&status=done&style=none&width=409)<br />修改脚本命令后通过 npm run test 运行测试套件。<br />编写一些工具函数。
+通过 npm install promises-aplus-tests ，可以下载测试套件。<br />![image.png](img/7.png)<br />修改脚本命令后通过 npm run test 运行测试套件。<br />编写一些工具函数。
 
 ```javascript
 const isFunction = obj => typeof obj === 'function'
@@ -301,7 +301,7 @@ const handleCallbacks = (callbacks, state, result) => {
 
 ## 4.6 测试
 
-运行npm run test<br />![image.png](https://cdn.nlark.com/yuque/0/2021/png/374731/1610874042506-47b45724-7b0f-41bd-8244-29579a1a9343.png#align=left&display=inline&height=50&margin=%5Bobject%20Object%5D&name=image.png&originHeight=50&originWidth=285&size=1430&status=done&style=none&width=285)<br />大功告成！
+运行npm run test<br />![image.png](img/8.png)<br />大功告成！
 <a name="tCVgD"></a>
 
 # 参考文章：
