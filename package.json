@@ -1,0 +1,17 @@
+{
+  "name": "promises-aplus",
+  "version": "1.0.0",
+  "description": "实现一个Promise/A+规范",
+  "main": "src/index.js",
+  "scripts": {
+    "test": "promises-aplus-tests src/index.js"
+  },
+  "keywords": [
+    "promises-aplus"
+  ],
+  "author": "林仕强",
+  "license": "ISC",
+  "dependencies": {
+    "promises-aplus-tests": "^2.1.2"
+  }
+}
