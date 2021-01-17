@@ -303,7 +303,109 @@ const handleCallbacks = (callbacks, state, result) => {
 
 运行npm run test<br />![image.png](img/8.png)<br />大功告成！
 <a name="tCVgD"></a>
+# 5.ES6 Promise API实现
 
+```javascript
+Promise.resolve = result => {
+  if (result instanceof Promise) {
+    return result
+  }
+  return new Promise((resolve) => resolve(result))
+}
+
+Promise.reject = reason => {
+  return new Promise((resolve, reject) => {
+    reject(reason)
+  })
+}
+
+Promise.all = promiseList => {
+  const resPromise = new Promise((resolve, reject) => {
+    let count = 0
+    const result = []
+    const length = promiseList.length
+
+    if (length === 0) {
+      return resolve(result)
+    }
+
+    promiseList.forEach((promise, index) => {
+      Promise.resolve(promise).then(value => {
+        count++
+        result[index] = value
+        if (count === length) {
+          resolve(result)
+        }
+      }, reason => reject(reason))
+    })
+  })
+
+  return resPromise
+}
+
+Promise.race = promiseList => {
+  const resPromise = new Promise((resolve, reject) => {
+    const length = promiseList.length
+
+    if (length === 0) {
+      return resolve(result)
+    } else {
+      promiseList.forEach(promise => {
+        Promise.resolve(promise).then(value => resolve(value), reason => reject(reason))
+      })
+    }
+  })
+
+  return resPromise
+}
+
+Promise.prototype.catch = function (onRejected) {
+  this.then(null, onRejected)
+}
+
+Promise.prototype.finally = function (fn) {
+  return this.then(value => Promise.resolve(fn()).then(() => value),
+    reason => Promise.resolve(fn()).then(() => {
+      throw reason
+    }))
+}
+
+Promise.allSettled = promiseList => {
+  return new Promise(resolve => {
+    let count = 0
+    const result = []
+    const length = promiseList.length
+
+    if (length === 0) {
+      return resolve(result)
+    } else {
+      promiseList.forEach((promise, index) => {
+        Promise.resolve(promise).then(value => {
+          count++
+          result[index] = {
+            value,
+            status: 'fulfilled',
+          }
+          if (count === length) {
+            return resolve(result)
+          }
+        }, reason => {
+          count++
+          result[index] = {
+            reason,
+            status: 'rejected',
+          }
+          if (count === length) {
+            return resolve(result)
+          }
+        })
+      })
+    }
+  })
+}
+```
+
+<a name="tCVgD"></a>
 # 参考文章：
 
 [原文：promise/A+规范](https://promisesaplus.com/)<br />[CSDN[衣乌安、]: 你该知道的promise（1）：Promise/A+规范中英文对照翻译](https://zsy-x.blog.csdn.net/article/details/108714782)<br />[知乎作者[夏日]：[译]Promise/A+ 规范](https://zhuanlan.zhihu.com/p/143204897)<br />[知乎作者[工业聚]: 100 行代码实现 Promises/A+ 规范](https://zhuanlan.zhihu.com/p/83965949)<br />
